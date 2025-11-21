@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f4f6f8">
+    
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>Smart Fire Alarm</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="main-wrapper">
+        <main id="main-selection" class="fade-in">
+          <header class="app-header">
+               <div class="header-content">
+                   <div class="logo-area">
+                       <div class="logo-box">
+                           <img src="icon.png" alt="Smart Fire Alarm Logo" class="custom-logo-img">
+                       </div>
+                       <div class="app-name">
+                           <h1>HỆ THỐNG CẢNH BÁO CHÁY LIÊN TỦ</h1> 
+                           
+                           <h2>Nhóm: 6</h2> 
+                           <p>Trần Đình Tú<p> 
+                           <p>Cao Ngọc Hiển<p> 
+                           <p>Trương Đình Trà<p> 
+                           <p>Hồ Văn Trung<p> 
+
+                           </div>
+                   </div>
+                   
+                   <div class="header-actions">
+                       <div class="time-badge"><i class="far fa-clock"></i> <span id="current-time">--:--</span></div>
+                   </div>
+               </div>
+          </header>
+
+            <div class="content-scroll-area">
+                <div class="section-heading">
+                    <h3>Khu vực giám sát</h3>
+
+                    <h4>Trạng thái hệ thống</h4>
+                </div>
+
+                <div class="cabinet-list">
+                    </div>
+                
+                <div class="bottom-spacer"></div>
+            </div>
+        </main>
+
+        <section id="details-view" class="hidden fade-in">
+            <div class="details-header-fixed">
+                <button class="btn-icon-back" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                
+                <div class="header-text-group">
+                    <h2 id="details-title">Chi tiết</h2>
+                    <p id="details-subtitle" class="header-subtitle">Vị trí</p>
+                </div>
+
+                <div class="header-actions-right">
+                    <button class="btn-icon-edit" onclick="openEditCabinetModal()">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <div class="live-badge"><span class="pulse-dot"></span> LIVE</div>
+                </div>
+            </div>
+            
+            <div id="sticky-alert-bar" class="hidden permanent-alert-bar">
+               <i class="fas fa-exclamation-triangle"></i>
+               <span id="sticky-alert-text">CẢNH BÁO: Nhiệt độ cao!</span>
+               <button onclick="goBack()" class="btn-clear-alert">Quay về</button>
+           </div>
+
+
+            <div class="details-scroll-content">
+                <div class="responsive-grid">
+                    <div class="grid-col sensors-group">
+                        <h3 class="group-title">Thông số môi trường</h3>
+                        <div class="sensor-row">
+                            <div class="sensor-box" id="temp-card">
+                                <div class="sensor-header">
+                                    <div class="s-icon temp"><i class="fas fa-temperature-high"></i></div>
+                                    <div class="s-state normal">Ổn</div>
+                                </div>
+                                <div class="s-data">
+                                    <span class="s-label">Nhiệt độ</span>
+                                    <span class="s-value">-- °C</span>
+                                </div>
+                            </div>
+                            <div class="sensor-box" id="flame-card">
+                                <div class="sensor-header">
+                                    <div class="s-icon fire"><i class="fas fa-fire-alt"></i></div>
+                                    <div class="s-state normal">Ổn</div>
+                                </div>
+                                <div class="s-data">
+                                    <span class="s-label">Lửa</span>
+                                    <span class="s-value">An toàn</span>
+                                </div>
+                            </div>
+                            <div class="sensor-box" id="gas-card">
+                                <div class="sensor-header">
+                                    <div class="s-icon gas"><i class="fas fa-wind"></i></div>
+                                    <div class="s-state normal">Ổn</div>
+                                </div>
+                                <div class="s-data">
+                                    <span class="s-label">Khí Gas</span>
+                                    <span class="s-value">--</span>
+                                </div>
+                            </div>
+                            <div class="sensor-box" id="rf-card">
+                                <div class="sensor-header">
+                                    <div class="s-icon rf"><i class="fas fa-broadcast-tower"></i></div>
+                                    <div class="s-state normal">Ổn</div>
+                                </div>
+                                <div class="s-data">
+                                    <span class="s-label">Tín hiệu RF</span>
+                                    <span class="s-value">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-col charts-group">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h3>Biểu đồ nhiệt</h3>
+                                <div class="toggle-group">
+                                    <button class="t-btn active" onclick="loadChartData('realtime')">Live</button>
+                                    <button class="t-btn" onclick="loadChartData('history')">Lịch sử</button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="temperatureChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="control-card">
+                            <div class="card-header">
+                                <h3>Cảnh báo</h3>
+                                <span id="led-status-display" class="status-badge off">---</span>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn-action on" onclick="sendCommand('LED_ON')">
+                                    <i class="fas fa-power-off"></i> BẬT
+                                </button>
+                                <button class="btn-action off" onclick="sendCommand('LED_OFF')">
+                                    <i class="far fa-circle"></i> TẮT
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-spacer"></div>
+            </div>
+        </section>
+    </div>
+
+    <div id="alert-modal" class="hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="alert-header">
+                <h2>NGUY HIỂM!</h2>
+            </div>
+            <div class="alert-info">
+                <p class="alert-loc" id="alert-location">--</p>
+                <p class="alert-reason" id="alert-device">PHÁT HIỆN SỰ CỐ</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-sos" onclick="callEmergency()"><i class="fas fa-phone"></i> GỌI 114 NGAY</button>
+                <button class="btn-ok" onclick="dismissAlert()">Tắt cảnh báo</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="edit-cabinet-modal" class="hidden modal-generic">
+        <div class="modal-backdrop" onclick="closeEditCabinetModal()"></div>
+        <div class="modal-card">
+            <div class="alert-header">
+                <h2>Sửa Tủ: <span id="current-cabinet-id-display"></span></h2>
+            </div>
+            <div class="form-group">
+                <label for="edit-cabinet-name">Tên hiển thị:</label>
+                <input type="text" id="edit-cabinet-name" placeholder="Ví dụ: Tủ bếp chính" class="modal-input">
+            </div>
+            <div class="form-group">
+                <label for="edit-cabinet-location">Vị trí/Mô tả:</label>
+                <input type="text" id="edit-cabinet-location" placeholder="Ví dụ: Tầng 1, gần bếp gas" class="modal-input">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-ok btn-save-cabinet" onclick="saveCabinetInfo()">Lưu thay đổi</button>
+                <button class="btn-cancel" onclick="closeEditCabinetModal()">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <div id="connection-bar" class="status-connecting">
+        <span class="conn-dot"></span> <span id="conn-text">Đang kết nối...</span>
+    </div>
+    
+    <audio id="alert-sound" src="alert1.mp3" preload="auto"></audio>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="script.js" defer></script>
+</body>
+</html>

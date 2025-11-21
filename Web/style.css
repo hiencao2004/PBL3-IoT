@@ -1,0 +1,612 @@
+/* ======================= GLOBAL & OPTIMIZATION ======================= */
+:root {
+    --bg-color: #f4f6f8;
+    --surface-color: rgba(255, 255, 255, 0.95);
+    --primary: #3b82f6;
+    --success: #10b981;
+    --danger: #ef4444;
+    --text-main: #1e293b;
+    --text-sub: #495669;
+    --shadow: 0 8px 20px rgba(0,0,0,0.04);
+    --radius: 20px;
+    --grad-blue: linear-gradient(135deg, #60a5fa, #2563eb);
+    --grad-red: linear-gradient(135deg, #fb7185, #e11d48);
+    --grad-orange: linear-gradient(135deg, #fbbf24, #d97706);
+    --grad-green: linear-gradient(135deg, #34d399, #059669);
+    --grad-purple: linear-gradient(135deg, #a78bfa, #7c3aed);
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    /* Tối ưu trải nghiệm chạm trên di động */
+    -webkit-tap-highlight-color: transparent; 
+}
+
+html, body {
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; /* Ngăn cuộn ngoài */
+    background-color: transparent; 
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    min-height: 100dvh; /* Sử dụng đơn vị dvh (Dynamic Viewport Height) hiện đại */
+    display: flex; 
+    flex-direction: column;
+    overscroll-behavior: none; /* Ngăn cuộn vượt giới hạn */
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+    user-select: none;
+}
+
+/* Background Shapes (Fixed) */
+.bg-shape { position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.5; pointer-events: none; }
+.shape-1 { top: -10%; left: -10%; width: 70vw; height: 70vw; background: #bfdbfe; }
+.shape-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #bbf7d0; }
+
+.main-wrapper { flex: 1; width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.hidden { display: none !important; }
+.fade-in { animation: fadeIn 0.3s ease-out; }
+#main-selection, #details-view { display: flex; flex-direction: column; height: 100%; overflow: hidden; flex: 1; }
+
+/* ======================= HEADER & NAVIGATION ======================= */
+
+/* HEADER (Fixed & Safe Area Optimized) */
+.app-header {
+    padding-top: calc(15px + env(safe-area-inset-top)); 
+    padding-left: calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+    padding-bottom: 25px;
+    background: transparent;
+    backdrop-filter: saturate(180%) blur(20px); 
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 100; flex-shrink: 0;
+}
+
+/* style.css (SAU KHI SỬA - Căn giữa toàn bộ nội dung trong header) */
+.header-content { 
+     display: flex; 
+     justify-content: center; /* Căn giữa các item con (logo-area và time-badge) */
+     align-items: center; 
+     max-width: 1000px; 
+     margin: 0 auto; 
+     width: 100%; 
+     gap: 20px; /* Thêm khoảng cách giữa logo và đồng hồ */
+}
+
+.logo-area { display: flex; align-items: center; gap: 10px; }
+
+/* style.css (ĐOẠN CẦN SỬA) */
+.logo-box {
+     order: -1; /* Đặt logo-box lên trên cùng (trước h1/app-name) */
+     /* LOẠI BỎ: background: var(--grad-blue); */
+     
+     width: 30px;  /* Tăng kích thước logo để dễ thấy */
+     height: 30px; 
+     margin-top: -80px; /* Tùy chỉnh: Dịch chuyển logo lên gần h1 hơn */
+     margin-bottom: 5px; /* Tùy chỉnh: Khoảng cách giữa logo và H2 (tên nhóm) */
+     
+     border-radius: 12px; 
+     display: flex; 
+     align-items: center; 
+     justify-content: center; 
+     flex-shrink: 0; 
+ }
+ /* Lưu ý: Bạn có thể giữ màu nền cũ nếu muốn ảnh logo trong một khung màu */
+ /* .logo-box { background: var(--grad-blue); ... } */
+/* Điều chỉnh khoảng cách giữa các phần trong khu vực tên ứng dụng */
+.app-name { 
+     text-align: center; 
+ }
+ 
+ /* Style cho tên đề tài */
+ .app-name h1 { 
+     font-size: 1.6rem; 
+     font-weight: 700; 
+     line-height: 1.3; 
+     margin-bottom: 8px; /* Giảm khoảng cách dưới tên đề tài */
+ }
+ 
+ /* Style cho thông tin Nhóm và Thành viên */
+ .app-name p { 
+     font-size: 0.75rem; /* Kích thước nhỏ hơn để không lấn át tiêu đề */
+     color: var(--text-sub); /* Màu xám hơn để phân biệt */
+     font-weight: 500; 
+     line-height: 1.3;
+     margin-top: 0;
+ }
+
+.time-badge { background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--text-sub); flex-shrink: 0; }
+
+/* Scroll Content & Safe Area */
+.content-scroll-area, .details-scroll-content {
+    flex: 1; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    -webkit-overflow-scrolling: touch;
+    padding: 20px; 
+    padding-left: calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+    width: 100%; max-width: 1000px; margin: 0 auto;
+    overscroll-behavior-y: contain;
+}
+.bottom-spacer { 
+    height: calc(100px + env(safe-area-inset-bottom)); 
+    width: 100%; flex-shrink: 0; 
+} 
+
+/* DETAILS HEADER (Fixed & Optimized) */
+.details-header-fixed {
+    padding-top: calc(10px + env(safe-area-inset-top));
+    padding-left: calc(20px + env(safe-area-inset-left));
+    padding-right: calc(20px + env(safe-area-inset-right));
+    padding-bottom: 15px;
+    background: transparent; 
+    backdrop-filter: saturate(180%) blur(20px); 
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(0,0,0,0.05); flex-shrink: 0; z-index: 100;
+    position: relative; /* Cần thiết cho căn giữa h2 tuyệt đối */
+}
+.btn-icon-back, .btn-icon-edit { 
+    border: none; background: rgba(255,255,255,0.5); width: 40px; height: 40px; border-radius: 12px; 
+    color: var(--text-main); font-size: 1rem; cursor: pointer; display: flex; align-items: center; 
+    justify-content: center; transition: transform 0.1s, background 0.1s; flex-shrink: 0;
+}
+.btn-icon-back:active, .btn-icon-edit:active { transform: scale(0.9); background: rgba(0,0,0,0.05); }
+
+.header-text-group { 
+    text-align: center; position: absolute; left: 0; right: 0; 
+    /* Dùng translate để căn giữa thực sự */
+    transform: translateX(0);
+    pointer-events: none; /* Cho phép click xuyên qua nếu không có nút */
+    padding: 0 80px; /* Tạo khoảng trống cho nút Back/Edit */
+}
+.details-header-fixed h2 { position: static; font-weight: 800; font-size: 1.1rem; line-height: 1.2; }
+.header-subtitle { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; font-weight: 600; }
+
+.header-actions-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.live-badge { font-size: 0.7rem; font-weight: 800; color: var(--danger); display: flex; align-items: center; gap: 4px; background: #fee2e2; padding: 6px 10px; border-radius: 12px; }
+.pulse-dot { width: 6px; height: 6px; background: var(--danger); border-radius: 50%; animation: blink 1s infinite; }
+
+/* ======================= CABINET LIST ======================= */
+.cabinet-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; }
+.cabinet-item {
+    background: var(--surface-color); border-radius: var(--radius); padding: 24px;
+    display: flex; align-items: center; gap: 15px;
+    box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.6);
+    cursor: pointer; transition: transform 0.1s, opacity 0.1s;
+}
+.cabinet-item:active { transform: scale(0.97); opacity: 0.8; background: #f8fafc; }
+.cab-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.cab-icon.blue { background: #eff6ff; color: var(--primary); }
+
+.cab-info { flex: 1; min-width: 0; margin-right: 10px; }
+.cab-info h4 { 
+    font-size: 1.1rem; margin-bottom: 4px; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+}
+.cab-sub { font-size: 0.85rem; color: var(--text-sub); }
+
+.cab-status { display: flex; align-items: center; gap: 8px; color: #cbd5e1; flex-shrink: 0; }
+.status-tag { 
+    padding: 6px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: #fff; white-space: nowrap;
+}
+.status-tag.normal { background: var(--success); } 
+.status-tag.alert { 
+    background: var(--danger); 
+    animation: pulse 2s infinite; 
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.25); 
+}
+
+/* ======================= DETAILS VIEW COMPONENTS ======================= */
+.responsive-grid { display: flex; gap: 20px; flex-wrap: wrap; width: 100%; }
+.grid-col { width: 100%; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+@media (min-width: 768px) { 
+    .responsive-grid { flex-wrap: nowrap; }
+    .sensors-group { flex: 1; } 
+    .charts-group { flex: 1.5; } 
+}
+.group-title { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Sensor Boxes */
+
+/* style.css (SAU KHI SỬA) */
+.sensor-row { 
+    display: grid; 
+    
+    /* === ĐẶT THÀNH 1 CỘT (TỪ TRÊN XUỐNG) === */
+    grid-template-columns: 1fr; 
+    
+    gap: 15px; 
+}
+
+
+/* style.css (Tìm và Sửa) */
+.sensor-box { 
+     background: white; 
+     border-radius: 18px; 
+     padding: 10px; /* <-- Tăng giá trị này (Ví dụ: 18px -> 25px) */
+     display: flex; 
+     flex-direction: column; 
+     gap: 12px; 
+     box-shadow: var(--shadow); 
+     border: 1px solid rgba(0,0,0,0.03); 
+     min-height: 120px; /* <-- Điều chỉnh ở mục 2 */
+ }
+
+.sensor-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.s-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; }
+.s-icon.temp { background: var(--grad-red); } .s-icon.fire { background: var(--grad-orange); }
+.s-icon.gas { background: var(--grad-green); } .s-icon.rf { background: var(--grad-purple); }
+.s-state { font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 8px; }
+.s-state.normal { background: #ecfdf5; color: #059669; } .s-state.alert { background: #fef2f2; color: #dc2626; }
+.s-data { display: flex; flex-direction: column; gap: 4px; }
+.s-label { font-size: 0.8rem; color: var(--text-sub); }
+.s-value { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Charts & Controls */
+.chart-card, .control-card { background: white; border-radius: 20px; padding: 20px; box-shadow: var(--shadow); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.card-header h3 { font-size: 1rem; font-weight: 700; }
+.toggle-group { background: #f1f5f9; padding: 4px; border-radius: 10px; display: flex; }
+.t-btn { border: none; background: none; padding: 6px 10px; font-size: 0.75rem; font-weight: 600; border-radius: 8px; color: var(--text-sub); cursor: pointer; }
+.t-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.chart-container { height: 240px; width: 100%; }
+.status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: #f1f5f9; color: var(--text-sub); }
+.status-badge.on { background: #dcfce7; color: #059669; }
+
+.action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.btn-action { padding: 18px; border: none; border-radius: 16px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: transform 0.1s; }
+.btn-action:active { transform: scale(0.96); opacity: 0.8; }
+.btn-action.on { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25); }
+.btn-action.off { background: #f1f5f9; color: var(--text-main); }
+
+
+/* ======================= ALERT MODAL (TỐI ƯU THIẾT KẾ) ======================= */
+#alert-modal { 
+    position: fixed; 
+    inset: 0; 
+    z-index: 2000; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 20px; 
+    /* Quan trọng: Mở rộng nó bao gồm cả Safe Area */
+    width: 100%;
+    height: 100%;
+}
+
+.modal-backdrop { 
+    /* Sử dụng fixed để chắc chắn bao phủ viewport */
+    position: fixed; /* Thay đổi từ absolute sang fixed */
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100%; 
+    
+    /* Màu nền đỏ đã có sẵn */
+    background: rgba(220, 38, 38, 0.8);
+}
+.modal-card { 
+    position: relative; background: white; width: 100%; max-width: 360px; border-radius: 28px; 
+    padding: 35px 25px; 
+    box-shadow: 0 25px 60px rgba(220, 38, 38, 0.5); 
+    animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    border: 4px solid #fee2e2; 
+    text-align: center;
+    padding-bottom: calc(35px + env(safe-area-inset-bottom)); 
+}
+.modal-icon { 
+    width: 90px; height: 90px; background: #fee2e2; color: var(--danger); border-radius: 50%; 
+    font-size: 3rem; display: flex; align-items: center; justify-content: center; 
+    margin: 0 auto 20px; 
+    animation: shake 0.5s infinite alternate; 
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.1); 
+}
+.alert-header h2 { color: var(--danger); font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
+
+/* Khối thông tin cảnh báo mới */
+.alert-info { 
+    background: #ffffff; 
+    padding: 18px 25px; 
+    border-radius: 18px; 
+    margin: 20px 0; 
+    border: none; 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; 
+}
+.alert-loc { 
+    /* Tên Tủ/Địa điểm (Sub-card) */
+    display: block;
+    background: rgb(39, 153, 90); 
+    color: var(--text-main); 
+    padding: 10px 15px; 
+    border-radius: 12px; 
+    font-size: 0.95rem; 
+    font-weight: 700; 
+    text-transform: uppercase;
+    margin-bottom: 0; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+}
+.alert-reason { 
+    /* Lý do (Nổi bật) */
+    font-weight: 900; 
+    color: var(--danger); 
+    font-size: 1.8rem; 
+    margin-top: 0; 
+    text-transform: uppercase; 
+    line-height: 1.2; 
+}
+.modal-actions {
+    display: grid; 
+    grid-template-columns: 1fr; 
+    gap: 15px; 
+    margin-top: 30px;
+}
+@media (min-width: 480px) {
+    .modal-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.btn-sos { 
+    width: 100%; 
+    background: linear-gradient(to right, #ef4444, #dc2626); 
+    color: white; border: none; padding: 18px; border-radius: 18px; 
+    font-size: 1.3rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; gap: 12px; 
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3); 
+    animation: heartbeat 1.5s infinite; cursor: pointer; 
+    transition: transform 0.1s, opacity 0.1s; /* Bổ sung transition */
+}
+.btn-sos:active { /* Hiệu ứng nhấn cho nút SOS */
+    transform: scale(0.96); 
+    opacity: 0.8;
+}
+.btn-ok { 
+    width: 100%; 
+    background: #f1f5f9; 
+    color: var(--text-sub); 
+    font-weight: 700; 
+    padding: 14px; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 18px; 
+    cursor: pointer; 
+    font-size: 0.95rem;
+    transition: transform 0.1s, opacity 0.1s; /* Bổ sung transition */
+}
+.btn-ok:active { transform: scale(0.96); opacity: 0.8; }
+
+
+/* ======================= UTILS & ANIMATIONS ======================= */
+/* Edit Cabinet Modal */
+.modal-generic { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-generic .modal-card { 
+    background: white; width: 100%; max-width: 360px; border-radius: 20px; 
+    padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+    animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    text-align: left;
+}
+.modal-generic .modal-backdrop { background: rgba(0, 0, 0, 0.5); }
+.modal-generic .alert-header h2 { font-size: 1.5rem; margin-bottom: 20px; color: var(--primary); text-align: center; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-sub); margin-bottom: 5px; }
+.modal-input { 
+    width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 10px; 
+    font-size: 1rem; color: var(--text-main); 
+}
+.modal-actions { margin-top: 20px; display: flex; gap: 10px; }
+.btn-save-cabinet { flex: 1; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.btn-cancel { flex: 1; background: #f1f5f9; color: var(--text-sub); border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+
+
+/* Connection Bar (Fixed & Optimized) */
+#connection-bar { 
+    position: fixed; 
+    bottom: calc(15px + env(safe-area-inset-bottom)); 
+    left: calc(20px + env(safe-area-inset-left)); 
+    transform: none; 
+    
+    background: rgba(30, 41, 59, 0.85); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2); 
+    border: 1px solid rgba(255,255,255,0.1); 
+    
+    padding: 8px 15px; 
+    border-radius: 25px; 
+    display: flex; align-items: center; gap: 8px; 
+    font-size: 0.75rem; 
+    font-weight: 600; 
+    color: white; 
+    z-index: 1500; white-space: nowrap; 
+}
+.conn-dot { width: 6px; height: 6px; border-radius: 50%; } 
+.status-connected .conn-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.status-disconnected { background: rgba(220, 38, 38, 0.85); }
+
+/* Keyframes */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes blink { 50% { opacity: 0.4; } }
+@keyframes strobe-flash { 0%, 100% { background: rgba(220, 38, 38, 0.7); } 50% { background: rgba(239, 68, 68, 0.9); } }
+@keyframes shake { 
+    0%, 100% { transform: translateX(0); } 
+    25% { transform: translateX(-4px); } 
+    75% { transform: translateX(4px); } 
+}
+@keyframes heartbeat { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.95; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .header-actions { display: none; }
+    .app-name h1 { font-size: 1rem; } 
+    .app-name p { display: none; }
+}
+
+
+/* Style cho ảnh PNG bên trong logo box */
+.custom-logo-img {
+     width: 150%; 
+     height: 150%;
+     /* Đảm bảo ảnh hiển thị đầy đủ, không bị biến dạng */
+     object-fit: contain; 
+ }
+
+
+ /* style.css (Thêm vào cuối file hoặc khu vực gần Header/Scroll Area) */
+
+/* Định nghĩa style cho Khu vực giám sát */
+.section-heading {
+     /* Quan trọng: Căn giữa văn bản */
+     text-align: center; 
+     
+     /* (Tùy chọn) Thêm giãn cách dưới nếu cần */
+     margin-bottom: 20px; 
+ }
+ 
+ /* style.css (Điều chỉnh style text nếu cần) */
+ .section-heading h3 { 
+     /* Đảm bảo h3 (Khu vực giám sát) được căn giữa */
+     font-size: 1.6rem;
+     font-weight: 800;
+     color: var(--text-main);
+     margin-bottom: 8px
+
+ }
+ 
+ .section-heading h4 { 
+     /* Đảm bảo p (Trạng thái hệ thống) được căn giữa */
+     font-size: 1.3rem;
+     font-weight: 800;
+     color: var(--text-main);
+     margin-bottom: 8px
+ }
+
+ /* ======================= STICKY PERMANENT ALERT BAR ======================= */
+.permanent-alert-bar {
+     background: #fef2f2; /* Nền đỏ nhạt */
+     color: var(--danger);
+     font-weight: 700;
+     padding: 12px 20px;
+     
+     /* Thiết lập cố định ngay dưới header */
+     position: sticky; 
+     top: calc(70px + env(safe-area-inset-top)); /* Điều chỉnh giá trị này (70px) để nó nằm ngay dưới header */
+     z-index: 90; /* Dưới header (z-index: 100) nhưng trên nội dung */
+     
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     font-size: 0.85rem;
+     box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+ }
+ 
+ .btn-clear-alert {
+     background: var(--danger);
+     color: white;
+     border: none;
+     padding: 6px 12px;
+     border-radius: 10px;
+     font-size: 0.8rem;
+     font-weight: 700;
+     cursor: pointer;
+     transition: background 0.2s;
+ }
+ .btn-clear-alert:hover {
+     background: #c9302c;
+ }
+ 
+ /* Thêm animation pulse nhẹ cho thanh cảnh báo */
+ .permanent-alert-bar:not(.hidden) {
+     animation: pulse-slow 4s infinite;
+ }
+ @keyframes pulse-slow {
+     0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.1); }
+     50% { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.2); }
+ }
+
+
+ /* ======================= RESPONSIVE OPTIMIZATIONS (iPhone 13) ======================= */
+@media (max-width: 480px) {
+
+    /* HEADER & Căn giữa */
+    .app-header {
+        /* Giảm padding dọc để header nhỏ hơn */
+        padding-top: calc(10px + env(safe-area-inset-top)); 
+        padding-bottom: 10px;
+    }
+
+    /* Tiêu đề chính */
+    .app-name h1 { 
+        font-size: 1.2rem; /* Giảm nhẹ font size cho màn hình nhỏ nhất */
+    }
+
+    /* Logo - Đảm bảo cân đối */
+    .logo-box {
+        width: 30px; 
+        height: 30px; 
+        /* Chỉnh lại margin-top để icon không bị dịch quá xa */
+        margin-top: 5px; /* Giữ nguyên giá trị 5px đã thống nhất */
+    }
+
+    /* Nội dung chung (padding) */
+    .content-scroll-area, .details-scroll-content {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+        gap: 15px;
+    }
+
+    /* Section Heading */
+    .section-heading h3 { 
+        font-size: 1.4rem; /* Giảm kích thước heading chính */
+    }
+    .section-heading h4 { 
+        font-size: 1.1rem; /* Giảm kích thước heading phụ */
+    }
+
+    /* Card Tủ */
+    .cabinet-item {
+        padding: 18px; /* Giảm padding card tủ */
+        gap: 10px;
+    }
+    .cab-icon {
+        width: 40px; 
+        height: 40px; /* Giảm kích thước icon tủ */
+    }
+
+    /* Sensor Boxes (chi tiết) */
+    .sensor-box {
+        min-height: 100px; /* Giảm chiều cao tối thiểu */
+        padding: 15px; 
+    }
+    .s-icon {
+        width: 32px; 
+        height: 32px; /* Giảm kích thước icon sensor */
+    }
+
+    /* Nút Điều khiển (BẬT/TẮT) */
+    .btn-action {
+        padding: 14px; /* Giảm padding nút điều khiển */
+        font-size: 0.9rem;
+        gap: 8px;
+    }
+}
+
+/* KHU VỰC CHỈNH SỬA CHO CẤP ĐỘ RỘNG HƠN (Đã có sẵn) */
+@media (max-width: 768px) {
+    .header-actions { display: none; }
+    /* Giữ nguyên các tối ưu hóa khác cho Header đã làm trước đó */
+}

@@ -1,0 +1,6 @@
+{
+  "id_thiet_bi": "TU_1_NHABEP", or "TU_2_KHOCHUA"
+  "nhiet_do": 30,
+  "lua": false,
+  "khi_ga": "thap"
+}
